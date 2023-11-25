@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 
@@ -25,8 +26,15 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+            margin: 0;
         }
 
+        .custom-file-input,
+        .custom-file-label,
+        .btn-upload {
+            width: 15%;
+        }
         header {
             width: 100%;
             position: fixed;
@@ -42,6 +50,7 @@
             position: static;
             /* Reset the position of the direct child elements */
         }
+
     </style>
 </head>
 
@@ -70,22 +79,59 @@
         </div>
     </header>
     <main>
-        <section class="py-5 text-center container">
-            <div class="row py-lg-5">
-                <div class="col-lg-6 col-md-8 mx-auto">
-                    <h1 class="fw-light">Image Viewer<br> & <br>Storage</h1>
-                    <p class="lead text-body-secondary">I had so much fun making this assignment please levae any
-                        feedback!</p>
-                    <p>
-                        <a class="btn btn-primary my-2" onclick="window.location.href='viewer.php'">View Image
-                            & Video Albums</a>
-                    </p>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+            <h2 class="mb-4 text-center" style="left:-23%;position:relative;">File Upload</h2>
+            
+            <form action="#" method="post" enctype="multipart/form-data">
+                <div class="mb-3 text-center">
+                <label for="file" style="width: 300%;left:-125%;position:relative;" class="form-label">Choose a file</label>
+                <input type="file" style="width: 300%;left:-125%;position:relative;" class="form-control custom-file-input" id="file" name="file" accept=".jpg, .jpeg, .png" required>
+                </div>                
+                <div class="mb-3 text-center">
+                    <span style="left:-23%;position:relative;" id="fileName" class="fw-bold">
+                        <?php
+                        if ($_SERVER['REQUEST_METHOD'] == "POST") {
+                            if (isset($_FILES['file'])) {
+                                $fileInfo = $_FILES['file'];
+                                $fileName = $fileInfo['name'];
+                                $fileTmpName = $fileInfo['tmp_name'];
+                                $fileSize = $fileInfo['size'];
+                                $fileType = mime_content_type($fileTmpName);
+
+                                $targetDirectory = "uploads/";
+                                $targetPath = $targetDirectory . $fileName;
+
+
+                                if (strpos($fileType, 'image') === 0) {
+                                    echo "File is an image. File type: " . $fileType;
+                                } elseif (strpos($fileType, 'video') === 0) {
+                                    echo "File is a video. File type: " . $fileType;
+                                } elseif (strpos($fileType, 'audio') === 0) {
+                                    echo "File is a audio. File type: " . $fileType;
+                                }
+                                } else {
+                                    echo "Invalid file type. Only images and videos are allowed.";
+                                    return;
+                                }
+                                
+                                move_uploaded_file($fileTmpName, $targetPath);
+                            } else {
+                                echo "No file selected.";
+                            }
+                        }
+                        ?>
+                    </span>
                 </div>
+
+
+                <button type="submit" style="width:300%;left:-125%;position:relative;" class="btn btn-primary btn-upload">Upload</button>
+            </form>
             </div>
-        </section>
+        </div>
+    </div>
     </main>
-
-
 </body>
 
 </html>

@@ -142,28 +142,66 @@
         <div class="album py-5">
             <div class="container">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
-                    <div id="template" class="col">
-                        <div class="card shadow-sm">
-                            <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
-                                xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"
-                                preserveAspectRatio="xMidYMid slice" focusable="false">
-                                <title>Placeholder</title>
-                                <rect width="100%" height="100%" fill="#55595c" /><text x="50%" y="50%" fill="#eceeef"
-                                    dy=".3em">Thumbnail</text>
-                            </svg>
-                            <div class="card-body">
-                                <p class="card-text">This is a wider card with supporting text below as a natural
-                                    lead-in to additional content. This content is a little bit longer.</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                <?php
+                    $files = scandir("uploads/");
+
+                    foreach ($files as $file) {
+                        // Exclude the current and parent directory entries
+                        if ($file != "." && $file != "..") {
+                            $fileLocation = "uploads/" . $file;
+
+                            // Determine file type
+                            $fileType = mime_content_type($fileLocation);
+                            $isImage = strpos($fileType, 'image') === 0;
+                            $isVideo = strpos($fileType, 'video') === 0;
+                            $isAudio = strpos($fileType, 'audio') === 0;
+
+                            // Set appropriate values for image, video, or audio
+                            $insertFileLocation = $fileLocation;
+                            $insertFileName = $file;
+
+                            echo <<<DHTML
+                            <div class="col">
+                                <div class="card shadow-sm">
+DHTML;
+                                    
+                            if ($isImage) {
+                                echo <<<DHTML
+                                        <img src="$insertFileLocation" class="img-fluid" alt="$insertFileName">
+DHTML;
+                            } elseif ($isVideo) {
+                                echo <<<DHTML
+                                        <video controls class="img-fluid">
+                                            <source src="$insertFileLocation" type="$fileType">
+                                            Your browser does not support the video tag.
+                                        </video>
+DHTML;
+                            } elseif ($isAudio) {
+                                echo <<<DHTML
+                                <object data="$insertFileLocation" type="$fileType" class="img-fluid" alt="$insertFileName">
+                                    <audio controls>
+                                        <source src="$insertFileLocation" type="$fileType">
+                                        Your browser does not support the audio tag.
+                                    </audio>
+                                </object>
+DHTML;
+                            }
+                                    
+                            echo <<<DHTML
+                                    <div class="card-body">
+                                        <p class="card-text">$insertFileName</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <small class="text-body-secondary">9 mins</small>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+DHTML;
+                        }
+                    }
+                ?>
                 </div>
             </div>
         </div>
