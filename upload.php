@@ -108,7 +108,7 @@
                                 
                                 move_uploaded_file($fileTmpName, $targetPath);
 								
-								$conn = new mysqli("localhost", "admin_admin", "jXcp0&172", "admin_school_uploads");
+								$conn = new mysqli("localhost", "admin_admin", "DATABASEPASSWORD", "admin_school_uploads");
 
 								if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
 

@@ -137,7 +137,7 @@
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
                 <?php
                     $files = array();
-					$conn = new mysqli("localhost", "admin_admin", "jXcp0&172", "admin_school_uploads");
+					$conn = new mysqli("localhost", "admin_admin", "DATABASEPASSWORD", "admin_school_uploads");
 
 					if (mysqli_connect_errno()) die("Connection failed: " . mysqli_connect_error());
 					
