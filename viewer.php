@@ -2,7 +2,7 @@
 <html lang="en" data-bs-theme="dark">
 
 <head>
-    <title>Image Hosting | Sign-In</title>
+    <title>Image Hosting | Viewer</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
@@ -114,7 +114,7 @@
 <body>
     <header>
         <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
-            <a href="/Main/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
+            <a href="/_School/ImageBrowsing/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" class="me-2" viewBox="0 0 118 94"
                     role="img">
                     <path fill-rule="evenodd" clip-rule="evenodd"
@@ -124,15 +124,8 @@
                 <span class="fs-4">Image Hosting</span>
             </a>
             <nav class="d-inline-flex mt-3 mt-md-0 ms-md-auto">
-                <button class="btn btn-md btn-primary btn-block" onclick="window.location.href='sign-in.php'">Home</button>&nbsp;&nbsp;
-                <?php 
-                    if (false) {
-                        echo('<button class="btn btn-md btn-primary btn-block" onclick="window.location.href=\'sign-in.php\'">Sign in</button>');
-                    } else {
-                        echo('<button class="btn btn-md btn-info btn-block" style="color:white;" onclick="window.location.href=\'upload.php\'">Upload Creation</button>&nbsp;&nbsp;');
-                        echo('<button class="btn btn-md btn-danger btn-block" onclick="window.location.href=\'sign-out.php\'">Sign Out</button>');
-                    }
-                ?>
+                <button class="btn btn-md btn-primary btn-block" onclick="window.location.href='/_School/ImageBrowsing/'">Home</button>&nbsp;&nbsp;
+                <button class="btn btn-md btn-success btn-block" style="color:white;" onclick="window.location.href='/_School/ImageBrowsing/upload.php'">Upload Creation</button>&nbsp;&nbsp;
             </nav>
         </div>
     </header>
@@ -143,63 +136,70 @@
             <div class="container">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
                 <?php
-                    $files = scandir("uploads/");
+                    $files = array();
+					$conn = new mysqli("localhost", "admin_admin", "jXcp0&172", "admin_school_uploads");
 
-                    foreach ($files as $file) {
-                        // Exclude the current and parent directory entries
-                        if ($file != "." && $file != "..") {
-                            $fileLocation = "uploads/" . $file;
+					if (mysqli_connect_errno()) die("Connection failed: " . mysqli_connect_error());
+					
+					$result = mysqli_query($conn, "SELECT * FROM `uploads`;");
+					
+					if (mysqli_num_rows($result) <= 0) die("Could not find images.");
+					
+					$files = mysqli_fetch_all($result);
+				
+					mysqli_close($conn);
 
-                            // Determine file type
-                            $fileType = mime_content_type($fileLocation);
-                            $isImage = strpos($fileType, 'image') === 0;
-                            $isVideo = strpos($fileType, 'video') === 0;
-                            $isAudio = strpos($fileType, 'audio') === 0;
-
-                            // Set appropriate values for image, video, or audio
-                            $insertFileLocation = $fileLocation;
-                            $insertFileName = $file;
-
-                            echo <<<DHTML
+                    foreach ($files as $file) {						
+						$fileLocation = "uploads/" . $file[1];
+						$fileType = $file[2];
+						$isImage = strpos($fileType, 'image') === 0;
+						$isVideo = strpos($fileType, 'video') === 0;
+						$isAudio = (strpos($fileType, 'audio') === 0 || strpos($fileType, 'application/octet-stream') === 0);
+						
+						if (!$isImage && !$isVideo && !$isAudio) {
+							$isImage = true;
+						}
+						
+						$insertFileLocation = $fileLocation;
+						echo <<<DHTML
                             <div class="col">
                                 <div class="card shadow-sm">
 DHTML;
-                                    
-                            if ($isImage) {
-                                echo <<<DHTML
-                                        <img src="$insertFileLocation" class="img-fluid" alt="$insertFileName">
+
+						if ($isImage) {
+							echo <<<DHTML
+							<img src="$insertFileLocation" class="img-fluid" alt="$file[1]">
 DHTML;
-                            } elseif ($isVideo) {
-                                echo <<<DHTML
-                                        <video controls class="img-fluid">
-                                            <source src="$insertFileLocation" type="$fileType">
-                                            Your browser does not support the video tag.
-                                        </video>
+						} elseif ($isVideo) {
+							echo <<<DHTML
+							<video controls class="img-fluid">
+								<source src="$insertFileLocation" >
+								Your browser does not support the video tag.
+							</video>
 DHTML;
-                            } elseif ($isAudio) {
-                                echo <<<DHTML
-                                <object data="$insertFileLocation" type="$fileType" class="img-fluid" alt="$insertFileName">
+						} elseif ($isAudio) {
+							echo <<<DHTML
+                                <object data="$insertFileLocation" type="$fileType" class="img-fluid" alt="$file[1]">
                                     <audio controls>
                                         <source src="$insertFileLocation" type="$fileType">
                                         Your browser does not support the audio tag.
                                     </audio>
                                 </object>
 DHTML;
-                            }
-                                    
-                            echo <<<DHTML
+						}
+
+						echo <<<DHTML
                                     <div class="card-body">
-                                        <p class="card-text">$insertFileName</p>
+                                        <p class="card-text">$file[1]</p>
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div class="btn-group">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href='$fileLocation'">View</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 DHTML;
-                        }
                     }
                 ?>
                 </div>

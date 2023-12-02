@@ -2,7 +2,7 @@
 <html lang="en" data-bs-theme="dark">
 
 <head>
-    <title>Image Hosting | Sign-In</title>
+    <title>Image Hosting | Index</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
@@ -48,7 +48,7 @@
 <body>
     <header>
         <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
-            <a href="/Main/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
+            <a href="/_School/ImageBrowsing/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" class="me-2" viewBox="0 0 118 94"
                     role="img">
                     <path fill-rule="evenodd" clip-rule="evenodd"
@@ -58,14 +58,7 @@
                 <span class="fs-4">Image Hosting</span>
             </a>
             <nav class="d-inline-flex mt-3 mt-md-0 ms-md-auto">
-                <?php 
-                    if (false) {
-                        echo('<button class="btn btn-md btn-primary btn-block" onclick="window.location.href=\'sign-in.php\'">Sign in</button>');
-                    } else {
-                        echo('<button class="btn btn-md btn-info btn-block" style="color:white;" onclick="window.location.href=\'upload.php\'">Upload Creation</button>&nbsp;&nbsp;');
-                        echo('<button class="btn btn-md btn-danger btn-block" onclick="window.location.href=\'sign-out.php\'">Sign Out</button>');
-                    }
-                ?>
+                <button class="btn btn-md btn-success btn-block" style="color:white;" onclick="window.location.href='/_School/ImageBrowsing/upload.php'">Upload Creation</button>&nbsp;&nbsp;
             </nav>
         </div>
     </header>

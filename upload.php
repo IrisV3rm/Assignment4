@@ -3,7 +3,7 @@
 <html lang="en" data-bs-theme="dark">
 
 <head>
-    <title>Image Hosting | Sign-In</title>
+    <title>Image Hosting | Upload</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
@@ -57,7 +57,7 @@
 <body>
     <header>
         <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
-            <a href="/Main/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
+            <a href="/_School/ImageBrowsing/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" class="me-2" viewBox="0 0 118 94"
                     role="img">
                     <path fill-rule="evenodd" clip-rule="evenodd"
@@ -67,14 +67,8 @@
                 <span class="fs-4">Image Hosting</span>
             </a>
             <nav class="d-inline-flex mt-3 mt-md-0 ms-md-auto">
-                <?php 
-                    if (false) {
-                        echo('<button class="btn btn-md btn-primary btn-block" onclick="window.location.href=\'sign-in.php\'">Sign in</button>');
-                    } else {
-                        echo('<button class="btn btn-md btn-info btn-block" style="color:white;" onclick="window.location.href=\'upload.php\'">Upload Creation</button>&nbsp;&nbsp;');
-                        echo('<button class="btn btn-md btn-danger btn-block" onclick="window.location.href=\'sign-out.php\'">Sign Out</button>');
-                    }
-                ?>
+				<button class="btn btn-md btn-primary btn-block" onclick="window.location.href='/_School/ImageBrowsing/'">Home</button>&nbsp;&nbsp;
+                <button class="btn btn-md btn-success btn-block" style="color:white;" onclick="window.location.href='/_School/ImageBrowsing/viewer.php'">Images</button>&nbsp;&nbsp;
             </nav>
         </div>
     </header>
@@ -87,36 +81,49 @@
             <form action="#" method="post" enctype="multipart/form-data">
                 <div class="mb-3 text-center">
                 <label for="file" style="width: 300%;left:-125%;position:relative;" class="form-label">Choose a file</label>
-                <input type="file" style="width: 300%;left:-125%;position:relative;" class="form-control custom-file-input" id="file" name="file" accept=".jpg, .jpeg, .png" required>
+                <input type="file" style="width: 300%;left:-125%;position:relative;" class="form-control custom-file-input" id="file" name="file" required>
                 </div>                
                 <div class="mb-3 text-center">
                     <span style="left:-23%;position:relative;" id="fileName" class="fw-bold">
                         <?php
+						function generateRandomFileName($originalFileName) {
+							$extension = pathinfo($originalFileName, PATHINFO_EXTENSION);
+							$randomFileName = uniqid() . "." . $extension;
+							return $randomFileName;
+						}
+						
                         if ($_SERVER['REQUEST_METHOD'] == "POST") {
                             if (isset($_FILES['file'])) {
                                 $fileInfo = $_FILES['file'];
-                                $fileName = $fileInfo['name'];
+                                $fileName = generateRandomFileName($fileInfo['name']);
                                 $fileTmpName = $fileInfo['tmp_name'];
                                 $fileSize = $fileInfo['size'];
-                                $fileType = mime_content_type($fileTmpName);
+                                $fileType = mime_content_type($fileInfo['tmp_name']);
 
                                 $targetDirectory = "uploads/";
                                 $targetPath = $targetDirectory . $fileName;
 
-
-                                if (strpos($fileType, 'image') === 0) {
-                                    echo "File is an image. File type: " . $fileType;
-                                } elseif (strpos($fileType, 'video') === 0) {
-                                    echo "File is a video. File type: " . $fileType;
-                                } elseif (strpos($fileType, 'audio') === 0) {
-                                    echo "File is a audio. File type: " . $fileType;
-                                }
-                                } else {
-                                    echo "Invalid file type. Only images and videos are allowed.";
-                                    return;
-                                }
+								echo("<script>console.log('$fileType');</script>");
+								echo("<script>console.log('".$fileInfo['name']."');</script>");
                                 
                                 move_uploaded_file($fileTmpName, $targetPath);
+								
+								$conn = new mysqli("localhost", "admin_admin", "jXcp0&172", "admin_school_uploads");
+
+								if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
+
+								$stmt = $conn->prepare("INSERT INTO uploads (fileName, fileType) VALUES (?, ?)");
+								$stmt->bind_param("ss", $fileName, $fileType);
+
+								if ($stmt->execute()) {
+									echo "Successfully uploaded!";
+								} else {
+									echo "Error: " . $stmt->error;
+								}
+
+								$stmt->close();
+								$conn->close();
+								
                             } else {
                                 echo "No file selected.";
                             }
